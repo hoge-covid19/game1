@@ -18,13 +18,12 @@ class Bullet < Sprite
     end
     #当たったとき
     def hit(other)
-        Sound[:explosion].play
         self.vanish
     end
 end
 
 
-# 弾丸を管理するクラス
+# ワクチンを管理するクラス
 class Bullets
     attr_accessor :bullets
     
@@ -41,6 +40,8 @@ class Bullets
         if Input.key_push?(K_SPACE)
             @bullets.push(Bullet.new(player.x,player.y))
             GAME_INFO[:vaccine] -= 1
+            
+            #ワクチン切れでGAME_OVER
             if GAME_INFO[:saved] < 15 && GAME_INFO[:vaccine] <= 0
                 GAME_INFO[:end_type] = 1
                 GAME_INFO[:scene] = :game_over

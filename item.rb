@@ -54,8 +54,8 @@ N = 1
         r0 = rand(1..100)
         if r0 <5
             (N - @items.size).times do
-            # どっちのアイテムにするか、ランダムで決める
-            @items.push(Apple.new)
+                # どっちのアイテムにするか、ランダムで決める
+                @items.push(Apple.new)
             end
         end
 

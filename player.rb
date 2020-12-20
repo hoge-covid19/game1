@@ -24,7 +24,7 @@ class Player < Sprite
         end
         
         # LIFEが0になるとゲームオーバー画面に遷移
-        if GAME_INFO[:life] <= 0
+        if  GAME_INFO[:life] <= 0
             GAME_INFO[:end_type] = 0
             GAME_INFO[:scene] = :game_over
         end
