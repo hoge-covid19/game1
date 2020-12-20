@@ -1,6 +1,8 @@
 class Player < Sprite
   def initialize(x,y,image)
-    @tamas = []
+    @tamas1 = []
+    @tamas2 = []
+    @tamas3 = []
     @tama_img = Image[:tama]
     super(x, y, image)
   end
