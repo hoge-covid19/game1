@@ -1,67 +1,84 @@
 require "dxopal"
 require_remote "player.rb"
-require_remote "enemy.rb"
 require_remote "item.rb"
+require_remote "bullet.rb"
+require_remote "sneese.rb"
+require_remote "load.rb"
+require_remote "patient.rb"
 
 include DXOpal
 
-#画像登録
-Image.register(:apple, 'images/apple.png')
-Image.register(:enemy, 'images/awabi.png')
-Image.register(:player, 'images/player.png')
-
-
-# 読み込みたい音声を登録する
-Sound.register(:get, 'sounds/get.wav')
-Sound.register(:explosion, 'sounds/explosion.wav')
-
-
-# ゲームの状態を記憶するハッシュを追加
+# ゲームの状態を記憶するハッシュ
 GAME_INFO = {
-  score: 0,        # score
-  scene: :title,   # title(init status)
+  life: 5,
+  saved: 0,
+  vaccine: 20,
+  scene: :title, 
+  end_type: 0
 }
 
-GROUND_Y = 400
+
+Window.width = 800
+Window.height = 480
+
 
 Window.load_resources do
     player = Player.new
-    # Itemsクラスのオブジェクトを作る
     items = Items.new
+    patients = Patients.new
+    bullets = Bullets.new
+    #sneeses = Sneeses.new
 
     Window.loop do
-        # 背景とスコア表示は、どの画面でも出すことにする
-        Window.draw_box_fill(0, 0, Window.width, Window.height, [0, 0, 0])
-        Window.draw_font(0, 0, "SCORE: #{GAME_INFO[:score]}", Font.default)
+        # 背景とスコア表示
+        Window.draw_box_fill(0, 0, Window.width, Window.height, [224, 224, 224])
+        #playerライフ表示
+        Window.draw_font(5, 10, "LIFE : #{GAME_INFO[:life]}", Font.default,color:C_BLACK)
+        #摂取可能なワクチンの残り
+        Window.draw_font(5, 70, "SLOT : #{GAME_INFO[:vaccine]}", Font.default,color:C_BLACK)
 
         # シーンごとの処理
         case GAME_INFO[:scene]
         when :title
             # タイトル画面
-            Window.draw_font(0, 30, "PRESS SPACE", Font.default)
-            Window.draw_font(250, 250, "SAVE WORLD", Font.default)
-            # スペースキーが押されたらシーンを変える
-            if Input.key_push?(K_SPACE)
+            Window.draw_font(330, 190, "PRESS ENTER", Font.default, color:C_RED)
+            Window.draw_font(330, 260, "SAVE PATIENT", Font.default,color:C_BLACK)
+            # enterキーでゲームスタート
+            if Input.key_push?(K_RETURN)
                 GAME_INFO[:scene] = :playing
             end
         when :playing
             # ゲーム中
             player.update
             items.update(player)
-
+            bullets.update(player,patients.patients)
+            patients.update(player,bullets.bullets)
+            #sneeses.update(player,patients.patients)
             player.draw
             items.draw
+            patients.draw
+            bullets.draw
+            #sneeses.draw
+        
         when :game_over
             # ゲームオーバー画面
-            Window.draw_font(250, 270, "PRESS SPACE", Font.default)
-            Window.draw_font(250, 240, "GAME OVER", Font.default)
-            #player.draw
-            #items.draw
-            # スペースキーが押されたらゲームの状態をリセットし、シーンを変える
-            if Input.key_push?(K_SPACE)
+            Window.draw_font(330, 190, "PRESS ENTER", Font.default,color:C_RED)
+            Window.draw_font(330, 260, "GAME OVER", Font.default,color:C_BLACK)
+            if GAME_INFO[:end_type] == 0
+                Window.draw_font(260, 290, "自分が感染してしまいました", Font.default,color:C_BLACK)
+            else 
+                 Window.draw_font(260, 290, "ワクチンがなくなりました", Font.default,color:C_BLACK)
+            end
+            # enterキーが押されたらリスタート
+            if Input.key_push?(K_ENTER)
                 player = Player.new
                 items = Items.new
-                GAME_INFO[:score] = 0
+                patients = Patients.new
+                bullets = Bullets.new
+              #  sneeses = Sneeses.new
+                
+                GAME_INFO[:life] = 5
+                GAME_INFO[:vaccine] = 25
                 GAME_INFO[:scene] = :playing
             end
         end
