@@ -10,12 +10,9 @@ class Sneese < Sprite
         #移動量
         @dx = rand(-6..6)
         @dy = rand(-6..6)
-        #定数
-        @c = 90
     end
     #移動処理
     def update
-       
         self.x += @dx
         self.y += @dy
         #画面外に出た場合削除
@@ -27,7 +24,7 @@ class Sneese < Sprite
             self.vanish
         end
     end
-    #当たったとき
+    #プレイヤーと当たったとき
     def hit(other)
         Sound[:explosion].play
         GAME_INFO[:life] -= 1
@@ -45,11 +42,12 @@ class Sneeses
     end
 
     def update(player,patients)
+        #発射したくしゃみのアップデート
         @sneeses.each{|x| x.update}
-
+        #くしゃみとプレイヤーの当たり判定
         Sprite.check(player, @sneeses)
         Sprite.clean(@sneeses)
-        
+        #マスク未着用の患者(Patient2)からのみ、くしゃみを発射する
         patients.each{|patient|
             if patient.class.name == "Kernel::Patient2"
                 if patient.y % 100 == 0
@@ -59,7 +57,7 @@ class Sneeses
         }
         
     end 
-    
+    #描画
     def draw
          Sprite.draw(@sneeses)
     end
